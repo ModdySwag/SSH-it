@@ -157,7 +157,19 @@ public static class AgentCli
 
                 var query = string.Join(" ", words);
                 var limit = int.TryParse(OptionalValueAfter(args, "--limit"), out var want) ? Math.Clamp(want, 1, 500) : 20;
-                DateTime? since = DateTime.TryParse(OptionalValueAfter(args, "--since"), out var date) ? date : null;
+                DateTime? since = null;
+                var sinceText = OptionalValueAfter(args, "--since");
+                if (!string.IsNullOrWhiteSpace(sinceText))
+                {
+                    // Same rule as --audit-export: a bad date is refused, never "no filter", or a typo
+                    // quietly prints the whole ledger as if it were the filtered answer.
+                    if (!DateTime.TryParse(sinceText, out var sinceValue))
+                    {
+                        Console.Error.WriteLine("--since is not a date: '" + sinceText + "' (try 2026-10-01)");
+                        return 2;
+                    }
+                    since = sinceValue;
+                }
 
                 var rows = CommandLedger.Search(query, limit, null,
                     OptionalValueAfter(args, "--host"), OptionalValueAfter(args, "--session"),
