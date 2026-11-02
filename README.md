@@ -20,6 +20,17 @@ from OpenSSH, no account, no cloud.
 | Sessions as plain JSON, tags and folders included. | The whole window: session list, terminal and file panel. |
 
 
+## Why this instead of a paid client
+
+- **No subscription, no account.** Free and MIT. Sessions are plain files on your disk.
+- **Your keys stay yours.** It runs the ssh that ships with Windows, so keys, agent and known hosts are used
+  the way OpenSSH uses them — no second credential store to trust.
+- **Nothing phones home.** No telemetry, no analytics, no cloud; the only connections are the ones you ask for.
+- **Your setup keeps working.** Import `ssh_config` or PuTTY sessions; agent keys, FIDO and jump chains still work.
+- **The paid-tier features are in the free build.** Split panes and broadcast, a two-pane file browser,
+  tunnels, session recording, tmux.
+- **Honest about the gaps.** Windows only; no mosh, no built-in RDP/VNC, no phone app.
+
 ## What it does
 
 **Sessions you own.** Hosts live in plain JSON under `%APPDATA%\SSH-it`, or next
