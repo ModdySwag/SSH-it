@@ -1,0 +1,458 @@
+﻿<Window x:Class="SshIt.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
+        Title="SSH-it" Height="820" Width="1320" MinHeight="520" MinWidth="880"
+        Icon="Assets/ssh-it.ico"
+        WindowStyle="None" ResizeMode="CanResize" WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource Brush.Window}"
+        Foreground="{DynamicResource Brush.Text}"
+        FontFamily="{StaticResource Font.UI}"
+        UseLayoutRounding="True" SnapsToDevicePixels="True">
+
+    <shell:WindowChrome.WindowChrome>
+        <shell:WindowChrome CaptionHeight="34" ResizeBorderThickness="6"
+                            GlassFrameThickness="0" CornerRadius="0"
+                            UseAeroCaptionButtons="False" />
+    </shell:WindowChrome.WindowChrome>
+
+    <Border x:Name="RootBorder" Background="{DynamicResource Brush.Window}">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="34" />
+                <RowDefinition Height="30" />
+                <RowDefinition Height="46" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="26" />
+            </Grid.RowDefinitions>
+
+            <!-- ============ title bar ============ -->
+            <Grid x:Name="TitleBar" Grid.Row="0" Background="{DynamicResource Brush.TitleBar}"
+                  MouseLeftButtonDown="TitleBar_MouseLeftButtonDown">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <Image Grid.Column="0" Width="20" Height="20" Margin="11,0,0,0" VerticalAlignment="Center"
+                       Source="Assets/ssh-it.ico" RenderOptions.BitmapScalingMode="HighQuality"
+                       ToolTip="SSH-it" />
+
+                <TextBlock Grid.Column="1" Text="SSH-it" Margin="9,0,0,0" VerticalAlignment="Center"
+                           FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource Brush.TextMuted}" />
+
+                <TextBlock x:Name="TitleText" Grid.Column="2" Margin="14,0,0,0" VerticalAlignment="Center"
+                           FontSize="12" Foreground="{DynamicResource Brush.TextMuted}"
+                           TextTrimming="CharacterEllipsis" />
+
+                <StackPanel Grid.Column="3" Orientation="Horizontal"
+                            shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                    <Button x:Name="PinButton" Style="{StaticResource Btn.Caption}" Content="&#xE718;"
+                            ToolTip="Pin to desktop" Click="PinButton_Click" />
+                    <Button x:Name="MinimizeButton" Style="{StaticResource Btn.Caption}" Content="&#xE921;"
+                            ToolTip="Minimize" Click="MinimizeButton_Click" />
+                    <Button x:Name="MaximizeButton" Style="{StaticResource Btn.Caption}" Content="&#xE922;"
+                            ToolTip="Maximize" Click="MaximizeButton_Click" />
+                    <Button x:Name="CloseButton" Style="{StaticResource Btn.Close}" Content="&#xE8BB;"
+                            ToolTip="Close" Click="CloseButton_Click" />
+                </StackPanel>
+            </Grid>
+
+            <!-- ============ menu bar ============ -->
+            <Border Grid.Row="1" Background="{DynamicResource Brush.MenuBar}"
+                    BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1">
+                <Menu x:Name="MainMenu" VerticalAlignment="Center" shell:WindowChrome.IsHitTestVisibleInChrome="True">
+                    <MenuItem Header="_File">
+                        <MenuItem Header="_New session…" InputGestureText="Ctrl+N" Click="NewSession_Click" />
+                        <MenuItem Header="_Quick connect…" InputGestureText="Ctrl+K" Click="QuickConnect_Click" />
+                        <MenuItem Header="_Local terminal" InputGestureText="Ctrl+Shift+L" Click="LocalTerminal_Click" />
+                        <MenuItem Header="New _window" InputGestureText="Ctrl+Shift+N" Click="NewWindow_Click" />
+                        <Separator />
+                        <MenuItem Header="Import from OpenSSH _config…" Click="ImportSshConfig_Click" />
+                        <MenuItem Header="Import from _PuTTY…" Click="ImportPutty_Click" />
+                        <MenuItem Header="_Export sessions…" Click="ExportSessions_Click" />
+                        <MenuItem x:Name="MenuWorkspaces" Header="_Workspaces" />
+                        <MenuItem Header="Import sessions…" Click="ImportSessions_Click" />
+                        <Separator />
+                        <MenuItem Header="_Open data folder" Click="OpenDataFolder_Click" />
+                        <Separator />
+                        <MenuItem Header="E_xit" InputGestureText="Alt+F4" Click="Exit_Click" />
+                    </MenuItem>
+
+                    <MenuItem Header="_Edit">
+                        <MenuItem Header="_Copy" InputGestureText="Ctrl+Shift+C" Click="Copy_Click" />
+                        <MenuItem Header="_Paste" InputGestureText="Ctrl+Shift+V" Click="Paste_Click" />
+                        <MenuItem Header="Select _all" InputGestureText="Ctrl+Shift+A" Click="SelectAll_Click" />
+                        <Separator />
+                        <MenuItem Header="_Find…" InputGestureText="Ctrl+F" Click="Find_Click" />
+                        <MenuItem Header="Clear _scrollback" Click="ClearScrollback_Click" />
+                    </MenuItem>
+
+                    <MenuItem Header="_View">
+                        <MenuItem x:Name="MenuSidebar" Header="_Sessions sidebar" IsCheckable="True" IsChecked="True"
+                                  Click="ToggleSidebar_Click" />
+                        <MenuItem x:Name="MenuRightPanel" Header="_Tool panel" IsCheckable="True" IsChecked="True"
+                                  Click="ToggleRightPanel_Click" />
+                        <MenuItem x:Name="MenuStatusBar" Header="Status _bar" IsCheckable="True" IsChecked="True"
+                                  Click="ToggleStatusBar_Click" />
+                        <Separator />
+                        <MenuItem x:Name="MenuTheme" Header="_Theme" />
+                        <MenuItem x:Name="MenuTerminalColours" Header="Terminal _colours" />
+                        <Separator />
+                        <MenuItem Header="_Zoom in" InputGestureText="Ctrl+=" Click="ZoomIn_Click" />
+                        <MenuItem Header="Zoom _out" InputGestureText="Ctrl+-" Click="ZoomOut_Click" />
+                        <MenuItem Header="_Reset zoom" InputGestureText="Ctrl+0" Click="ZoomReset_Click" />
+                        <MenuItem Header="Reset window _opacity" Click="ResetOpacity_Click" />
+                        <MenuItem x:Name="MenuPin" Header="Pin to _desktop" IsCheckable="True" Click="PinMenu_Click" />
+                        <Separator />
+                        <MenuItem Header="_Full screen" InputGestureText="F11" Click="FullScreen_Click" />
+                        <Separator />
+                        <MenuItem Header="Split _right" InputGestureText="Ctrl+Shift+D" Click="SplitRight_Click" />
+                        <MenuItem Header="Split _down" InputGestureText="Ctrl+Shift+E" Click="SplitDown_Click" />
+                        <MenuItem Header="Close _pane" InputGestureText="Ctrl+Shift+Q" Click="ClosePane_Click" />
+                        <MenuItem x:Name="MenuBroadcast" Header="_Broadcast input to all panes" InputGestureText="Ctrl+Shift+B" IsCheckable="True" IsEnabled="False" Click="Broadcast_Click" />
+                        <MenuItem Header="Send to _every pane…" InputGestureText="Ctrl+Shift+Enter" Click="SendToAll_Click" />
+                    </MenuItem>
+
+                    <MenuItem Header="_Session">
+                        <MenuItem Header="_Connect" InputGestureText="Enter" Click="Connect_Click" />
+                        <MenuItem Header="_Disconnect" Click="Disconnect_Click" />
+                        <MenuItem Header="_Reconnect" Click="Reconnect_Click" />
+                        <MenuItem Header="Diagnose _connection…" InputGestureText="Ctrl+Shift+G" Click="Diagnose_Click" />
+                        <MenuItem Header="Fleet _posture…" Click="FleetPosture_Click" />
+                        <MenuItem Header="Watch a _command…" Click="WatchCommand_Click" />
+                        <MenuItem Header="Compare command _output…" Click="CompareOutput_Click" />
+                        <MenuItem Header="_Blast radius…" Click="BlastRadius_Click" />
+                        <MenuItem Header="Approve a command for a_gents…" Click="ApproveCommand_Click" />
+                        <Separator />
+                        <MenuItem Header="New _tab" InputGestureText="Ctrl+Shift+T" Click="NewTab_Click" />
+                        <MenuItem Header="_Close tab" InputGestureText="Ctrl+Shift+W" Click="CloseTab_Click" />
+                        <MenuItem Header="Close _all tabs" Click="CloseAllTabs_Click" />
+                        <MenuItem Header="Move tab to a new _window" InputGestureText="Ctrl+Shift+M" Click="TearOffTab_Click" />
+                        <Separator />
+                        <MenuItem Header="Send file over _ZMODEM…" Click="SendFileZmodem_Click" />
+                        <Separator />
+                        <MenuItem Header="_Edit session…" InputGestureText="F2" Click="EditSession_Click" />
+                        <MenuItem Header="_Duplicate session" Click="DuplicateSession_Click" />
+                        <MenuItem Header="_Delete session" InputGestureText="Del" Click="DeleteSession_Click" />
+                    </MenuItem>
+
+                    <MenuItem Header="_Tools">
+                        <MenuItem Header="_Files (SFTP)" InputGestureText="Ctrl+Shift+F" Click="ShowFiles_Click" />
+                        <MenuItem Header="_Port forwarding" Click="ShowTunnels_Click" />
+                        <MenuItem Header="_Snippets" Click="ShowSnippets_Click" />
+                        <MenuItem Header="_Lock session…" InputGestureText="Ctrl+Shift+K" Click="LockSession_Click" />
+                        <MenuItem Header="_Host information" Click="ShowInfo_Click" />
+                        <MenuItem Header="_Performance…" Click="ShowPerformance_Click" />
+                        <Separator />
+                        <MenuItem Header="_Key manager…" Click="KeyManager_Click" />
+                        <MenuItem Header="Shell _integration script…" Click="ShellIntegration_Click" />
+                        <MenuItem Header="tmux control mode…" Click="Tmux_Click" />
+                        <Separator />
+                        <MenuItem Header="Play _recording…" Click="PlayRecording_Click" />
+                        <MenuItem Header="Command _palette…" InputGestureText="Ctrl+Shift+P" Click="CommandPalette_Click" />
+                        <MenuItem Header="_Options…" InputGestureText="Ctrl+," Click="Options_Click" />
+                    </MenuItem>
+
+                    <MenuItem Header="_Help">
+                        <MenuItem Header="_Keyboard shortcuts" Click="Shortcuts_Click" />
+                        <MenuItem Header="What's _new" Click="WhatsNew_Click" />
+                        <Separator />
+                        <MenuItem Header="Copy _diagnostics" Click="CopyDiagnostics_Click" />
+                        <MenuItem Header="Open _log folder" Click="OpenLogFolder_Click" />
+                        <Separator />
+                        <MenuItem Header="_About SSH-it" Click="About_Click" />
+                    </MenuItem>
+                </Menu>
+            </Border>
+
+            <!-- ============ toolbar ============ -->
+            <Border Grid.Row="2" Background="{DynamicResource Brush.ToolBar}"
+                    BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1">
+                <Grid Margin="10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Button Grid.Column="0" Style="{StaticResource Btn.Toolbar}" Click="NewSession_Click"
+                            ToolTip="New session (Ctrl+N)">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="&#xE710;" FontFamily="{StaticResource Font.Icons}" FontSize="12"
+                                       VerticalAlignment="Center" />
+                            <TextBlock Text="New" Margin="7,0,0,0" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="8,0,0,0">
+                        <Border Width="1" Background="{DynamicResource Brush.Border}" Margin="0,8" />
+                        <Grid Margin="8,0,0,0" Width="330">
+                            <TextBox x:Name="QuickConnectBox" Style="{StaticResource Text.Search}"
+                                     Height="30" Padding="30,0,9,0"
+                                     KeyDown="QuickConnectBox_KeyDown"
+                                     ToolTip="user@host or ssh://user@host:port — Enter to connect" />
+                            <TextBlock Text="&#xE721;" FontFamily="{StaticResource Font.Icons}" FontSize="11"
+                                       Foreground="{DynamicResource Brush.TextMuted}"
+                                       Margin="10,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                       IsHitTestVisible="False" />
+                            <TextBlock x:Name="QuickConnectHint" Text="user@host  ·  Enter to connect"
+                                       Margin="30,0,0,0" VerticalAlignment="Center" FontSize="12"
+                                       Foreground="{DynamicResource Brush.TextDisabled}" IsHitTestVisible="False" />
+                        </Grid>
+                        <Button Style="{StaticResource Btn.Accent}" Content="Connect"
+                                Margin="6,0,0,0" Height="30" Click="QuickConnectGo_Click" />
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="10,0,0,0">
+                        <Border Width="1" Background="{DynamicResource Brush.Border}" Margin="0,8,6,8" />
+                        <Button x:Name="FilesButton" Style="{StaticResource Btn.Toolbar}" Click="ShowFiles_Click"
+                                ToolTip="Files (Ctrl+Shift+F)">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE8B7;" FontFamily="{StaticResource Font.Icons}" FontSize="13" />
+                                <TextBlock Text="Files" Margin="6,0,0,0" />
+                            </StackPanel>
+                        </Button>
+                        <Button x:Name="TunnelsButton" Style="{StaticResource Btn.Toolbar}" Click="ShowTunnels_Click"
+                                ToolTip="Port forwarding">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE968;" FontFamily="{StaticResource Font.Icons}" FontSize="13" />
+                                <TextBlock Text="Tunnels" Margin="6,0,0,0" />
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource Btn.Toolbar}" Click="ShowSnippets_Click"
+                                ToolTip="Snippets (Ctrl+Shift+S)">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="&#xE8C8;" FontFamily="{StaticResource Font.Icons}" FontSize="13" />
+                                <TextBlock Text="Snippets" Margin="6,0,0,0" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <StackPanel Grid.Column="3" Orientation="Horizontal">
+                        <Button Style="{StaticResource Btn.Icon}" Click="Find_Click" ToolTip="Find (Ctrl+F)">
+                            <TextBlock Text="&#xE721;" FontFamily="{StaticResource Font.Icons}" FontSize="12" />
+                        </Button>
+                        <Button Style="{StaticResource Btn.Icon}" Click="Options_Click" ToolTip="Options (Ctrl+,)">
+                            <TextBlock Text="&#xE713;" FontFamily="{StaticResource Font.Icons}" FontSize="12" />
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- ============ main area ============ -->
+            <Grid Grid.Row="3">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition x:Name="SidebarColumn" Width="268" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition x:Name="RightPanelColumn" Width="390" />
+                </Grid.ColumnDefinitions>
+
+                <Border x:Name="Sidebar" Grid.Column="0" Background="{DynamicResource Brush.Panel}"
+                        BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,1,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Grid Grid.Row="0" Margin="12,12,8,6">
+                            <TextBlock Text="SESSIONS" Style="{StaticResource Text.Header}" VerticalAlignment="Center" />
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                                <Button Style="{StaticResource Btn.Icon}" Width="24" Height="24" Click="NewFolder_Click"
+                                        ToolTip="New folder">
+                                    <TextBlock Text="&#xE8F4;" FontFamily="{StaticResource Font.Icons}" FontSize="11" />
+                                </Button>
+                                <Button Style="{StaticResource Btn.Icon}" Width="24" Height="24" Click="NewSession_Click"
+                                        ToolTip="New session">
+                                    <TextBlock Text="&#xE710;" FontFamily="{StaticResource Font.Icons}" FontSize="11" />
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+
+                        <Grid Grid.Row="1" Margin="10,0,10,8">
+                            <TextBox x:Name="SessionSearch" Height="28" Padding="28,0,8,0"
+                                     TextChanged="SessionSearch_TextChanged" />
+                            <TextBlock Text="&#xE721;" FontFamily="{StaticResource Font.Icons}" FontSize="11"
+                                       Margin="9,0,0,0" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                       Foreground="{DynamicResource Brush.TextMuted}" IsHitTestVisible="False" />
+                            <TextBlock x:Name="SessionSearchHint" Text="Filter sessions"
+                                       Margin="28,0,0,0" VerticalAlignment="Center" FontSize="12"
+                                       Foreground="{DynamicResource Brush.TextDisabled}" IsHitTestVisible="False" />
+                        </Grid>
+
+                        <TreeView x:Name="SessionTree" Grid.Row="2" Margin="6,0,6,0" Padding="0,0,0,8"
+                                  Background="Transparent" BorderThickness="0"
+                                  SelectedItemChanged="SessionTree_SelectedItemChanged"
+                                  PreviewMouseRightButtonDown="SessionTree_PreviewMouseRightButtonDown" />
+
+                        <Border Grid.Row="3" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,1,0,0"
+                                Padding="10,8">
+                            <Grid>
+                                <TextBlock x:Name="SessionCountText" Text="0 sessions"
+                                           Style="{StaticResource Text.Caption}" VerticalAlignment="Center" />
+                                <Button Style="{StaticResource Btn.Icon}" Width="24" Height="24"
+                                        HorizontalAlignment="Right" Click="OpenDataFolder_Click"
+                                        ToolTip="Open data folder">
+                                    <TextBlock Text="&#xE8B7;" FontFamily="{StaticResource Font.Icons}" FontSize="11" />
+                                </Button>
+                            </Grid>
+                        </Border>
+                    </Grid>
+                </Border>
+
+                <GridSplitter x:Name="SidebarSplitter" Grid.Column="1" Width="1" HorizontalAlignment="Stretch"
+                              Background="{DynamicResource Brush.Border}" ResizeBehavior="PreviousAndNext" />
+
+                <Grid Grid.Column="2" Background="{DynamicResource Brush.Window}">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="36" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" Background="{DynamicResource Brush.Panel}"
+                            BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1">
+                        <Grid>
+                            <ScrollViewer HorizontalScrollBarVisibility="Hidden" VerticalScrollBarVisibility="Disabled">
+                                <StackPanel x:Name="TabStrip" Orientation="Horizontal" Margin="6,0" />
+                            </ScrollViewer>
+                            <Button x:Name="NewTabButton" Style="{StaticResource Btn.Icon}" Width="26" Height="26"
+                                    HorizontalAlignment="Right" Margin="0,0,6,0" Click="NewTab_Click"
+                                    ToolTip="New tab (Ctrl+Shift+T)">
+                                <TextBlock Text="&#xE710;" FontFamily="{StaticResource Font.Icons}" FontSize="11" />
+                            </Button>
+                        </Grid>
+                    </Border>
+
+                    <Grid Grid.Row="1">
+                        <ContentControl x:Name="TerminalHost" HorizontalContentAlignment="Stretch"
+                                        VerticalContentAlignment="Stretch" />
+
+                        <Grid x:Name="EmptyState" Background="{DynamicResource Brush.Window}">
+                            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" MaxWidth="520">
+                                <Border Width="64" Height="64" CornerRadius="14" HorizontalAlignment="Center"
+                                        Background="{DynamicResource Brush.AccentDim}">
+                                    <TextBlock Text="&#xE756;" FontFamily="{StaticResource Font.Icons}" FontSize="28"
+                                               Foreground="{DynamicResource Brush.Accent}"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center" />
+                                </Border>
+                                <TextBlock Text="No session open" FontSize="20" FontWeight="SemiBold"
+                                           HorizontalAlignment="Center" Margin="0,18,0,6" />
+                                <TextBlock Text="Pick a host on the left, or connect to one directly."
+                                           Foreground="{DynamicResource Brush.TextMuted}" FontSize="13"
+                                           HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,22,0,0">
+                                    <Button Content="New session" Style="{StaticResource Btn.Accent}"
+                                            Padding="18,0" Click="NewSession_Click" />
+                                    <Button Content="Quick connect" Margin="8,0,0,0" Padding="18,0"
+                                            Click="QuickConnect_Click" />
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,8,0,0">
+                                    <Button Content="Import from OpenSSH config…" Padding="14,0"
+                                            Style="{StaticResource Btn.Toolbar}" Click="ImportSshConfig_Click"
+                                            ToolTip="Bring in every Host block from ~/.ssh/config" />
+                                    <Button Content="Local terminal" Margin="8,0,0,0" Padding="14,0"
+                                            Style="{StaticResource Btn.Toolbar}" Click="LocalTerminal_Click"
+                                            ToolTip="A PowerShell tab on this machine" />
+                                </StackPanel>
+                                <TextBlock Text="Tip: Ctrl+Shift+P searches every session, command you have run, snippet and setting."
+                                           Foreground="{DynamicResource Brush.TextMuted}" FontSize="11.5"
+                                           HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center"
+                                           Margin="0,16,0,0" />
+                                <TextBlock x:Name="EmptyRecentLabel" Text="Recent" Style="{StaticResource Text.Header}"
+                                           Margin="0,30,0,6" HorizontalAlignment="Left" Visibility="Collapsed" />
+                                <ItemsControl x:Name="EmptyRecentList" />
+                            </StackPanel>
+                        </Grid>
+                    </Grid>
+                </Grid>
+
+                <GridSplitter x:Name="RightSplitter" Grid.Column="3" Width="1" HorizontalAlignment="Stretch"
+                              Background="{DynamicResource Brush.Border}" ResizeBehavior="PreviousAndNext" />
+
+                <Border x:Name="RightPanel" Grid.Column="4" Background="{DynamicResource Brush.Panel}"
+                        BorderBrush="{DynamicResource Brush.Border}" BorderThickness="1,0,0,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="38" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
+
+                        <Border Grid.Row="0" BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,0,0,1">
+                            <Grid Margin="8,0">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <Button x:Name="FilesTabButton" Content="Files" Style="{StaticResource Btn.Toolbar}"
+                                            Height="28" Click="ShowFiles_Click" />
+                                    <Button x:Name="TunnelsTabButton" Content="Tunnels" Style="{StaticResource Btn.Toolbar}"
+                                            Height="28" Click="ShowTunnels_Click" />
+                                    <Button x:Name="InfoTabButton" Content="Info" Style="{StaticResource Btn.Toolbar}"
+                                            Height="28" Click="ShowInfo_Click" />
+                                </StackPanel>
+                                <Button Style="{StaticResource Btn.Icon}" Width="24" Height="24"
+                                        HorizontalAlignment="Right" Click="ToggleRightPanel_Click" ToolTip="Hide panel">
+                                    <TextBlock Text="&#xE711;" FontFamily="{StaticResource Font.Icons}" FontSize="10" />
+                                </Button>
+                            </Grid>
+                        </Border>
+
+                        <ContentControl x:Name="ToolHost" Grid.Row="1" />
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- ============ status bar ============ -->
+            <Border x:Name="StatusBar" Grid.Row="4" Background="{DynamicResource Brush.StatusBar}"
+                    BorderBrush="{DynamicResource Brush.Border}" BorderThickness="0,1,0,0">
+                <Grid Margin="10,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                        <Ellipse x:Name="StatusDot" Width="7" Height="7" Fill="{DynamicResource Brush.TextDisabled}"
+                                 VerticalAlignment="Center" />
+                        <TextBlock x:Name="StatusText" Text="Ready" Margin="7,0,0,0" FontSize="11"
+                                   Foreground="{DynamicResource Brush.TextMuted}" VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <TextBlock x:Name="StatusHostText" Grid.Column="1" Margin="18,0,0,0" FontSize="11"
+                               Foreground="{DynamicResource Brush.TextMuted}" VerticalAlignment="Center" />
+
+                    <TextBlock x:Name="StatusMessage" Grid.Column="2" Margin="18,0,0,0" FontSize="11"
+                               Foreground="{DynamicResource Brush.TextMuted}" VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis" />
+
+                    <!-- R3-24: the accessibility live region. A screen reader announces every change
+                         here; a sighted user sees the last announcement beside the status line. -->
+                    <TextBlock x:Name="StatusAnnounce" Grid.Column="3" Margin="12,0,0,0" FontSize="11"
+                               Foreground="{DynamicResource Brush.TextMuted}" VerticalAlignment="Center"
+                               TextTrimming="CharacterEllipsis" MaxWidth="380"
+                               AutomationProperties.AutomationId="AnnounceRegion"
+                               AutomationProperties.LiveSetting="Polite" />
+
+                    <TextBlock x:Name="StatusLatency" Grid.Column="4" Margin="0,0,16,0" FontSize="11"
+                               Foreground="{DynamicResource Brush.TextMuted}" VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Column="5" Text="UTF-8" FontSize="11" Margin="0,0,16,0"
+                               Foreground="{DynamicResource Brush.TextMuted}" VerticalAlignment="Center" />
+
+                    <TextBlock Grid.Column="6" Text="SSH" FontSize="11"
+                               Foreground="{DynamicResource Brush.TextMuted}" VerticalAlignment="Center" />
+                </Grid>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

@@ -1,0 +1,31 @@
+# Build output
+bin/
+obj/
+publish/
+dist/
+*.pdb
+*.dll
+*.exe
+
+# IDE / tooling
+.vs/
+*.user
+*.suo
+*.DotSettings.user
+
+# Local data written by a portable run
+data/
+
+# Scratch
+uploads/
+*.log
+
+# Private working notes and audit labs (never published)
+CONTINUATION-*.md
+audit/
+.git-private-*/
+fix-*.py
+
+docs/competitive/
+docs/ROADMAP-2026-11-01.md
+docs/benchmarks/

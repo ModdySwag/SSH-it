@@ -1,0 +1,37 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>SSH-it</AssemblyName>
+    <ApplicationIcon>Assets\ssh-it.ico</ApplicationIcon>
+    <RootNamespace>SshIt</RootNamespace>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <Version>1.0.31</Version>
+    <FileVersion>1.0.31.0</FileVersion>
+    <Product>SSH-it</Product>
+    <Company>SshIt</Company>
+    <Description>SSH-it — the SSH workspace for Windows</Description>
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Assets\ssh-it.ico" CopyToOutputDirectory="PreserveNewest" />
+    <Resource Include="Assets\ssh-it.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="System.IO.Ports" Version="10.0.14" />
+  </ItemGroup>
+
+</Project>

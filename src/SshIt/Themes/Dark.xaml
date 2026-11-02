@@ -1,0 +1,54 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Surfaces -->
+    <SolidColorBrush x:Key="Brush.Window"             Color="#0F1518" />
+    <SolidColorBrush x:Key="Brush.Panel"              Color="#141C20" />
+    <SolidColorBrush x:Key="Brush.PanelAlt"           Color="#182228" />
+    <SolidColorBrush x:Key="Brush.Elevated"           Color="#1D282E" />
+    <SolidColorBrush x:Key="Brush.Control"            Color="#1B252B" />
+    <SolidColorBrush x:Key="Brush.ControlHover"       Color="#233038" />
+    <SolidColorBrush x:Key="Brush.ControlPressed"     Color="#2A3942" />
+    <SolidColorBrush x:Key="Brush.Border"             Color="#26333A" />
+    <SolidColorBrush x:Key="Brush.BorderStrong"       Color="#33454E" />
+
+    <!-- Text -->
+    <SolidColorBrush x:Key="Brush.Text"               Color="#E8F0F2" />
+    <SolidColorBrush x:Key="Brush.TextMuted"          Color="#93A7AF" />
+    <SolidColorBrush x:Key="Brush.TextDisabled"       Color="#5D7079" />
+    <SolidColorBrush x:Key="Brush.TextOnAccent"       Color="#04120F" />
+
+    <!-- Accent (teal) -->
+    <SolidColorBrush x:Key="Brush.Accent"             Color="#2FD4B6" />
+    <SolidColorBrush x:Key="Brush.AccentHover"        Color="#4AE3C8" />
+    <SolidColorBrush x:Key="Brush.AccentPressed"      Color="#22B79D" />
+    <SolidColorBrush x:Key="Brush.AccentDim"          Color="#153B36" />
+
+    <!-- Semantic -->
+    <SolidColorBrush x:Key="Brush.Success"            Color="#4ADE80" />
+    <SolidColorBrush x:Key="Brush.Warn"               Color="#FBBF24" />
+    <SolidColorBrush x:Key="Brush.Danger"             Color="#F87171" />
+    <SolidColorBrush x:Key="Brush.Info"               Color="#60A5FA" />
+
+    <!-- Terminal -->
+    <SolidColorBrush x:Key="Brush.TerminalBackground" Color="#0B1013" />
+    <SolidColorBrush x:Key="Brush.TerminalForeground" Color="#DCE7EA" />
+    <SolidColorBrush x:Key="Brush.TerminalCursor"     Color="#2FD4B6" />
+    <SolidColorBrush x:Key="Brush.TerminalSelection"  Color="#1F4A45" />
+    <SolidColorBrush x:Key="Brush.TerminalMatch"      Color="#5A4A12" />
+
+    <!-- Shell chrome -->
+    <SolidColorBrush x:Key="Brush.TitleBar"           Color="#0F1518" />
+    <SolidColorBrush x:Key="Brush.MenuBar"            Color="#121A1E" />
+    <SolidColorBrush x:Key="Brush.ToolBar"            Color="#121A1E" />
+    <SolidColorBrush x:Key="Brush.StatusBar"          Color="#0D1418" />
+    <SolidColorBrush x:Key="Brush.TabActive"          Color="#0B1013" />
+    <SolidColorBrush x:Key="Brush.TabInactive"        Color="#141C20" />
+    <SolidColorBrush x:Key="Brush.TabHover"           Color="#1B252B" />
+    <SolidColorBrush x:Key="Brush.Selection"          Color="#1E3A38" />
+    <SolidColorBrush x:Key="Brush.Hover"              Color="#1B252B" />
+
+    <Color x:Key="Color.Accent">#2FD4B6</Color>
+    <Color x:Key="Color.Window">#0F1518</Color>
+    <Color x:Key="Color.Text">#E8F0F2</Color>
+</ResourceDictionary>
