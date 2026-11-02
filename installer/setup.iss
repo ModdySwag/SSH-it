@@ -2,7 +2,7 @@
 ; Build: "C:\Users\Moddy\AppData\Local\Programs\Inno Setup 6\ISCC.exe" installer\setup.iss
 
 #define MyAppName "SSH-it"
-#define MyAppVersion "1.0.31"
+#define MyAppVersion "1.0.32"
 #define MyAppPublisher "SSH-it"
 #define MyAppExeName "SSH-it.exe"
 #define MyAppId "{{7C4E1B62-5D2A-4F0B-9E45-2B7A6C1D8F31}"
@@ -29,7 +29,7 @@ ArchitecturesInstallIn64BitMode=x64compatible
 MinVersion=10.0.17763
 CloseApplications=no
 RestartApplications=no
-VersionInfoVersion=1.0.29.0
+VersionInfoVersion=1.0.32.0
 VersionInfoCompany={#MyAppPublisher}
 VersionInfoDescription={#MyAppName} Setup
 

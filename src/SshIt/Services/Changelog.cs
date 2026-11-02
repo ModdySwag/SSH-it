@@ -8,7 +8,25 @@ namespace SshIt.Services;
 public static class Changelog
 {
     public const string Text =
-        "1.0.29 — the current build\n" +
+        "1.0.32 — the current build\n" +
+        "\n" +
+        "Network discovery\n" +
+        "  · Session > Network scan finds SSH hosts on a network you name: a CIDR block, a\n" +
+        "    range or one address; TCP connect on one port, up to 4,096 addresses, with the\n" +
+        "    banner and host key of every host that answers.\n" +
+        "  · Results become sessions in one click. A host and port already in the list is\n" +
+        "    skipped, and nothing is saved until you add it.\n" +
+        "\n" +
+        "The terminal, on its own\n" +
+        "  · Focus mode (Ctrl+Shift+Z) hides the sidebar, the tool panel and the status bar\n" +
+        "    together, and puts them back exactly as they were.\n" +
+        "\n" +
+        "Release hygiene\n" +
+        "  · The source now carries an MIT LICENSE file, and the winget manifest carries a\n" +
+        "    real SHA-256 instead of a placeholder.\n" +
+        "  · A diagnostic probe command containing spaces is quoted once, not twice.\n" +
+        "\n" +
+        "1.0.29 — fleet posture and the agent boundary\n" +
         "\n" +
         "Agent boundary\n" +
         "  · Signed, expiring leases and one-command approvals bound to a pane's pty.\n" +

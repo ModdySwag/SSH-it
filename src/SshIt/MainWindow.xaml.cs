@@ -493,11 +493,14 @@ public partial class MainWindow : Window
             _layout.Maximized = WindowState == WindowState.Maximized;
         }
 
-        s.SidebarVisible = Sidebar.Visibility == Visibility.Visible;
-        s.RightPanelVisible = RightPanel.Visibility == Visibility.Visible;
-        s.StatusBarVisible = StatusBar.Visibility == Visibility.Visible;
-        if (s.SidebarVisible) s.SidebarWidth = SidebarColumn.Width.Value;
-        if (s.RightPanelVisible) s.RightPanelWidth = RightPanelColumn.Width.Value;
+        if (!_focusMode)
+        {
+            s.SidebarVisible = Sidebar.Visibility == Visibility.Visible;
+            s.RightPanelVisible = RightPanel.Visibility == Visibility.Visible;
+            s.StatusBarVisible = StatusBar.Visibility == Visibility.Visible;
+            if (s.SidebarVisible) s.SidebarWidth = SidebarColumn.Width.Value;
+            if (s.RightPanelVisible) s.RightPanelWidth = RightPanelColumn.Width.Value;
+        }
         _store.SaveSettings();
     }
 
@@ -1225,6 +1228,7 @@ public partial class MainWindow : Window
 
     private void ToggleRightPanel(bool? show = null)
     {
+        if (_focusMode) ExitFocusMode();
         var visible = show ?? RightPanel.Visibility != Visibility.Visible;
         RightPanel.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
         RightSplitter.Visibility = RightPanel.Visibility;
@@ -1243,6 +1247,7 @@ public partial class MainWindow : Window
 
         if (ctrl && shift && e.Key == Key.N) { NewWindow_Click(this, new RoutedEventArgs()); e.Handled = true; return; }
         if (ctrl && shift && e.Key == Key.P) { OpenPalette(); e.Handled = true; return; }
+        if (ctrl && shift && e.Key == Key.Z) { ToggleFocusMode(); e.Handled = true; return; }
         if (ctrl && shift && e.Key == Key.L) { LocalTerminal_Click(this, new RoutedEventArgs()); e.Handled = true; return; }
         if (ctrl && !shift && e.Key == Key.N) { NewSession(null); e.Handled = true; return; }
         if (ctrl && !shift && e.Key == Key.K) { QuickConnect_Click(this, new RoutedEventArgs()); e.Handled = true; return; }

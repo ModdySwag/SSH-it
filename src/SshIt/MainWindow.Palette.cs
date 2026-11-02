@@ -325,6 +325,9 @@ public partial class MainWindow
             case "send-to-all":
                 SendToAllInteractive();
                 break;
+            case "focus-mode":
+                ToggleFocusMode();
+                break;
 
             // Session
             case "connect": if (PaletteHasTab("Connect")) Connect_Click(this, new RoutedEventArgs()); break;
@@ -332,6 +335,7 @@ public partial class MainWindow
             case "reconnect": if (PaletteHasTab("Reconnect")) Reconnect_Click(this, new RoutedEventArgs()); break;
             case "diagnose": if (PaletteHasTab("Diagnose")) Diagnose_Click(this, new RoutedEventArgs()); break;
             case "posture": FleetPosture_Click(this, new RoutedEventArgs()); break;
+            case "scan": NetworkScan_Click(this, new RoutedEventArgs()); break;
             case "watch": WatchCommand_Click(this, new RoutedEventArgs()); break;
             case "diff": CompareOutput_Click(this, new RoutedEventArgs()); break;
             case "blast": BlastRadius_Click(this, new RoutedEventArgs()); break;

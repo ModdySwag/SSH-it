@@ -329,6 +329,13 @@ public partial class MainWindow
     private void FleetPosture_Click(object sender, RoutedEventArgs e)
         => new Views.FleetPostureWindow(_store.Sessions) { Owner = this }.ShowDialog();
 
+    /// <summary>
+    /// R3-22: find SSH hosts on a network the user names. TCP connect only, one port, bounded;
+    /// a session exists only after the user adds it. Not a port scanner by construction.
+    /// </summary>
+    private void NetworkScan_Click(object sender, RoutedEventArgs e)
+        => new Views.NetworkScanWindow(_store) { Owner = this }.ShowDialog();
+
     /// <summary>Round 3B, R3-09: rerun the tab's last command on an interval, highlighting changes.</summary>
     private void WatchCommand_Click(object sender, RoutedEventArgs e)
     {
@@ -376,6 +383,7 @@ public partial class MainWindow
 
     private void ToggleSidebar_Click(object sender, RoutedEventArgs e)
     {
+        if (_focusMode) ExitFocusMode();
         var visible = Sidebar.Visibility != Visibility.Visible;
         Sidebar.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
         SidebarSplitter.Visibility = Sidebar.Visibility;
@@ -387,9 +395,64 @@ public partial class MainWindow
 
     private void ToggleStatusBar_Click(object sender, RoutedEventArgs e)
     {
+        if (_focusMode) ExitFocusMode();
         var visible = StatusBar.Visibility != Visibility.Visible;
         StatusBar.Visibility = visible ? Visibility.Visible : Visibility.Collapsed;
         MenuStatusBar.IsChecked = visible;
+    }
+
+    private bool _focusMode;
+    private bool _focusSidebar;
+    private bool _focusRightPanel;
+    private bool _focusStatusBar;
+
+    /// <summary>
+    /// One key that gives the terminal the whole window: the sidebar, the tool panel and the
+    /// status bar go away together and come back exactly as they were. The saved layout is not
+    /// touched, so a restart opens the panels the user actually chose, never the focus-mode state.
+    /// </summary>
+    private void ToggleFocusMode_Click(object sender, RoutedEventArgs e) => ToggleFocusMode();
+
+    private void ToggleFocusMode()
+    {
+        if (_focusMode)
+        {
+            ExitFocusMode();
+            StatusMessage.Text = "Focus mode off.";
+            return;
+        }
+
+        _focusSidebar = Sidebar.Visibility == Visibility.Visible;
+        _focusRightPanel = RightPanel.Visibility == Visibility.Visible;
+        _focusStatusBar = StatusBar.Visibility == Visibility.Visible;
+        _focusMode = true;
+        ApplyChrome(false, false, false);
+        MenuFocus.IsChecked = true;
+        StatusMessage.Text = "Focus mode: Ctrl+Shift+Z brings the panels back.";
+    }
+
+    private void ExitFocusMode()
+    {
+        if (!_focusMode) return;
+        _focusMode = false;
+        ApplyChrome(_focusSidebar, _focusRightPanel, _focusStatusBar);
+        MenuFocus.IsChecked = false;
+    }
+
+    private void ApplyChrome(bool sidebar, bool rightPanel, bool statusBar)
+    {
+        Sidebar.Visibility = sidebar ? Visibility.Visible : Visibility.Collapsed;
+        SidebarSplitter.Visibility = Sidebar.Visibility;
+        SidebarColumn.Width = new GridLength(sidebar ? Math.Max(200, _store.Settings.SidebarWidth) : 0);
+        MenuSidebar.IsChecked = sidebar;
+
+        RightPanel.Visibility = rightPanel ? Visibility.Visible : Visibility.Collapsed;
+        RightSplitter.Visibility = RightPanel.Visibility;
+        RightPanelColumn.Width = new GridLength(rightPanel ? Math.Max(280, _store.Settings.RightPanelWidth) : 0);
+        MenuRightPanel.IsChecked = rightPanel;
+
+        StatusBar.Visibility = statusBar ? Visibility.Visible : Visibility.Collapsed;
+        MenuStatusBar.IsChecked = statusBar;
     }
 
     private void SetTheme(string mode)

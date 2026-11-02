@@ -17,7 +17,7 @@ public static class AgentCli
     private static readonly string[] Verbs =
     {
         "--exec", "--sftp-list", "--sftp-get", "--sftp-put", "--sftp-mirror", "--sessions", "--mcp",
-        "--tunnel-up", "--tunnel-list", "--tunnel-down", "--posture",
+        "--tunnel-up", "--tunnel-list", "--tunnel-down", "--posture", "--scan",
         "--evidence-verify", "--evidence-export", "--watch", "--diff", "--blast",
         "--snapshot", "--snapshots",
         "--lease-grant", "--lease-list", "--lease-revoke", "--lease-verify", "--lease-clear", "--approve",
@@ -1019,9 +1019,85 @@ public static class AgentCli
                 return stopped ? 0 : 1;
             }
 
+            if (args.Contains("--scan", StringComparer.OrdinalIgnoreCase))
+            {
+                var target = OptionalValueAfter(args, "--scan");
+                if (string.IsNullOrWhiteSpace(target))
+                {
+                    Console.Error.WriteLine("--scan needs a target: 192.168.1.0/24, 192.168.1.10-60, or one address");
+                    return 2;
+                }
+                if (!NetworkScan.TryParseTargets(target, out var addresses, out var parseError))
+                {
+                    Console.Error.WriteLine(parseError);
+                    return 2;
+                }
+
+                var port = NetworkScan.DefaultPort;
+                var portAt = Array.FindIndex(args, a => a.Equals("--port", StringComparison.OrdinalIgnoreCase));
+                if (portAt >= 0 &&
+                    (portAt + 1 >= args.Length || !int.TryParse(args[portAt + 1], out port) || port is < 1 or > 65535))
+                {
+                    Console.Error.WriteLine("--port must be 1..65535");
+                    return 2;
+                }
+
+                var timeoutMs = NetworkScan.DefaultTimeoutMs;
+                var timeoutAt = Array.FindIndex(args, a => a.Equals("--timeout", StringComparison.OrdinalIgnoreCase));
+                if (timeoutAt >= 0 &&
+                    (timeoutAt + 1 >= args.Length || !int.TryParse(args[timeoutAt + 1], out timeoutMs) ||
+                     timeoutMs is < 100 or > 10_000))
+                {
+                    Console.Error.WriteLine("--timeout must be 100..10000 milliseconds");
+                    return 2;
+                }
+
+                var keyscan = args.Contains("--keyscan", StringComparer.OrdinalIgnoreCase);
+                var hits = NetworkScan.SweepAsync(addresses, port, timeoutMs, NetworkScan.DefaultConcurrency,
+                    null, CancellationToken.None).GetAwaiter().GetResult();
+                if (keyscan)
+                    NetworkScan.FillFingerprintsAsync(hits, 3, 8, null, CancellationToken.None).GetAwaiter().GetResult();
+
+                var answered = hits.Count(hit => hit.Open);
+                if (json)
+                {
+                    Console.Out.WriteLine(JsonSerializer.Serialize(new
+                    {
+                        ok = true,
+                        target,
+                        port,
+                        tried = addresses.Count,
+                        answered,
+                        hosts = hits.Where(hit => hit.Open).Select(hit => new
+                        {
+                            address = hit.Address,
+                            port = hit.Port,
+                            service = hit.Service,
+                            banner = hit.Banner,
+                            fingerprint = hit.Fingerprint,
+                            ms = hit.Milliseconds
+                        })
+                    }));
+                }
+                else
+                {
+                    Console.Out.WriteLine(
+                        $"scan {target} port {port}: {addresses.Count} address{(addresses.Count == 1 ? "" : "es")}, {timeoutMs} ms each");
+                    foreach (var hit in hits.Where(hit => hit.Open).OrderBy(hit => hit.Address, StringComparer.Ordinal))
+                    {
+                        var line = $"{hit.Address,-42} {hit.Port,5}  {hit.Service,-8} {hit.BannerText}";
+                        if (keyscan && hit.Fingerprint.Length > 0) line += "  " + hit.Fingerprint;
+                        Console.Out.WriteLine(line);
+                    }
+                    Console.Out.WriteLine($"{answered} of {addresses.Count} answered.");
+                }
+                return 0;
+            }
+
             Console.Error.WriteLine("usage: --exec <session> <command> [--json] [--timeout n]");
             Console.Error.WriteLine("       --sftp-list <session> <path> | --sftp-get <session> <remote> <local>");
             Console.Error.WriteLine("       --sftp-put <session> <local> <remote> | --sessions | --mcp");
+            Console.Error.WriteLine("       --scan <cidr|range|address> [--port n] [--timeout ms] [--keyscan] [--json]");
             return 2;
         }
         catch (AgentAccessDeniedException ex)

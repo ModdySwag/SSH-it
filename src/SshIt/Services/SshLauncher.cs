@@ -113,7 +113,9 @@ public static class SshLauncher
             args.Add(string.IsNullOrWhiteSpace(session.User) ? session.Host : $"{session.User}@{session.Host}");
         }
 
-        if (!string.IsNullOrEmpty(command)) args.Add(QuoteArgument(command));
+        // The join below quotes every element once; quote a command here as well and a
+        // command containing whitespace reaches the remote shell wrapped in literal quotes.
+        if (!string.IsNullOrEmpty(command)) args.Add(command);
         return string.Join(' ', args.Select(QuoteArgument));
     }
 

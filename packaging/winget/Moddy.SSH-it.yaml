@@ -2,7 +2,7 @@
 #   winget install --manifest packaging\winget\Moddy.SSH-it.yaml
 # Submit to winget-pkgs only after the release is signed and installed once by hand.
 PackageIdentifier: Moddy.SSH-it
-PackageVersion: 1.0.31
+PackageVersion: 1.0.32
 PackageLocale: en-US
 Publisher: Moddy
 PublisherUrl: https://moddys.net
@@ -16,7 +16,7 @@ Scope: user
 InstallModes: [ interactive, silent ]
 Installers:
   - Architecture: x64
-    InstallerUrl: https://moddys.net/downloads/SSH-it-Setup-1.0.31.exe
-    InstallerSha256: REPLACE_WITH_SHA256
+    InstallerUrl: https://moddys.net/downloads/SSH-it-Setup-1.0.32.exe
+    InstallerSha256: 81d2d56e23fd3a09673253dc718a507655bf59af524d96a607c5b03959cd4945
 ManifestType: singleton
 ManifestVersion: 1.6.0

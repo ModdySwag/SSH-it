@@ -1,4 +1,6 @@
 ﻿using System.IO;
+using System.Net;
+using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
@@ -91,6 +93,7 @@ public static class SelfTest
         ThemePalettes();
         JumpChainRoute();
         X11Checks();
+        NetworkScanChecks();
         ConnectionKinds();
         ZmodemChecks();
         WindowSessions();
@@ -1104,6 +1107,82 @@ public static class SelfTest
     }
 
     /// <summary>
+    /// The scan parser is the part that can be wrong quietly — an off-by-one in a /24 is a host
+    /// missed or a broadcast address probed — so it is pinned here. The sweep is exercised
+    /// against a listener on loopback, never the real network.
+    /// </summary>
+    private static void NetworkScanChecks()
+    {
+        var parsed = NetworkScan.TryParseTargets("192.168.1.0/24", out var block, out var error);
+        Check("scan: a /24 is 254 usable addresses, network and broadcast skipped",
+            parsed && block.Count == 254 &&
+            block[0].ToString() == "192.168.1.1" && block[^1].ToString() == "192.168.1.254",
+            error.Length > 0 ? error : $"{block.Count} from {block.FirstOrDefault()} to {block.LastOrDefault()}");
+
+        Check("scan: a /32 is the one address given",
+            NetworkScan.TryParseTargets("10.0.0.7/32", out var one, out error) &&
+            one.Count == 1 && one[0].ToString() == "10.0.0.7", error);
+
+        Check("scan: a last-octet range expands inclusively",
+            NetworkScan.TryParseTargets("192.168.1.10-60", out var range, out error) &&
+            range.Count == 51 && range[0].ToString() == "192.168.1.10" && range[^1].ToString() == "192.168.1.60",
+            error.Length > 0 ? error : range.Count.ToString());
+
+        var refused = !NetworkScan.TryParseTargets("10.0.0.0/16", out _, out var capError) && capError.Contains("cap");
+        Check("scan: a /16 is refused by name, not silently truncated", refused, capError);
+
+        var v6Range = !NetworkScan.TryParseTargets("2001:db8::/64", out _, out var v6Error);
+        var v6One = NetworkScan.TryParseTargets("2001:db8::1", out var v6, out _) && v6.Count == 1;
+        Check("scan: IPv6 is one address, never a range", v6Range && v6One, v6Error);
+
+        var sshBanner = NetworkScan.ClassifyBanner("SSH-2.0-OpenSSH_9.6");
+        var webBanner = NetworkScan.ClassifyBanner("HTTP/1.1 400 Bad Request");
+        var silent = NetworkScan.ClassifyBanner("");
+        Check("scan: the banner names the service, not the port",
+            sshBanner == "SSH" && webBanner == "HTTP" && silent == "open",
+            $"{sshBanner}/{webBanner}/{silent}");
+
+        var existing = new List<Session> { new() { Host = "192.168.1.5", Port = 22 } };
+        var created = NetworkScan.SessionsFor(new[]
+        {
+            new ScanHit { Address = "192.168.1.5", Port = 22, Open = true, Service = "SSH" },
+            new ScanHit { Address = "192.168.1.9", Port = 22, Open = true, Service = "SSH" }
+        }, existing, out var duplicates);
+        Check("scan: adding results skips a host and port already saved",
+            created.Count == 1 && duplicates == 1 && created[0].Host == "192.168.1.9",
+            $"{created.Count} new, {duplicates} duplicate");
+
+        var listener = new TcpListener(IPAddress.Loopback, 0);
+        listener.Start();
+        var port = ((IPEndPoint)listener.LocalEndpoint).Port;
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                using var client = await listener.AcceptTcpClientAsync().ConfigureAwait(false);
+                var stream = client.GetStream();
+                var bytes = Encoding.ASCII.GetBytes("SSH-2.0-SSHitTest\r\n");
+                await stream.WriteAsync(bytes).ConfigureAwait(false);
+                await stream.FlushAsync().ConfigureAwait(false);
+                await Task.Delay(250).ConfigureAwait(false);
+            }
+            catch { }
+        });
+
+        var found = NetworkScan.SweepAsync(new[] { IPAddress.Loopback }, port, 1000, 4, null, CancellationToken.None)
+            .GetAwaiter().GetResult();
+        var hit = found.Single();
+        Check("scan: a listening port is found and its banner read",
+            hit.Open && hit.Service == "SSH" && hit.Banner.StartsWith("SSH-2.0-SSHitTest", StringComparison.Ordinal),
+            $"{hit.Open}/{hit.Service}/{hit.Banner}");
+
+        listener.Stop();
+        var closed = NetworkScan.SweepAsync(new[] { IPAddress.Loopback }, port, 600, 4, null, CancellationToken.None)
+            .GetAwaiter().GetResult().Single();
+        Check("scan: a closed port is not reported open", !closed.Open, $"{closed.Note} after {closed.Milliseconds} ms");
+    }
+
+    /// <summary>
     /// Telnet's option traffic is stripped before the parser sees it, and the serial formatter is
     /// what the session tree shows. Both are pure, so both are pinned down here.
     /// </summary>
@@ -1505,6 +1584,12 @@ public static class SelfTest
             handshakeArgs.Contains("-vvv") && handshakeArgs.Contains("BatchMode=yes") &&
             handshakeArgs.Contains("-T") && handshakeArgs.EndsWith("true"),
             handshakeArgs);
+
+        var spacedArgs = SshLauncher.BuildProbeArguments(probeSession, false, "echo hello world");
+        Check("diagnose: a probe command with spaces is quoted exactly once",
+            spacedArgs.EndsWith("\"echo hello world\"", StringComparison.Ordinal) &&
+            spacedArgs.Count(c => c == '"') == 2,
+            spacedArgs);
 
         var fp = HostKeys.Fingerprint(Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes("abc")));
         Check("host keys: fingerprint matches OpenSSH's SHA256 form",
@@ -3532,7 +3617,7 @@ public static class SelfTest
             summary.Length + " chars");
 
         Check("help: the changelog names this build and mentions no network",
-            Changelog.Text.Contains("1.0.29", StringComparison.Ordinal)
+            Changelog.Text.Contains("1.0.32", StringComparison.Ordinal)
             && Changelog.Text.Contains("MCP", StringComparison.Ordinal)
             && !Changelog.Text.Contains("http", StringComparison.OrdinalIgnoreCase),
             Changelog.Text.Length + " chars");

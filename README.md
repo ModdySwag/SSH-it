@@ -174,6 +174,20 @@ that tries to leave the download folder is reduced to a leaf name, and a
 **Keys without the ritual.** List the keys in `~/.ssh`, read fingerprints, copy
 the public half, and generate a new ed25519 key from the Key manager.
 
+**Find the hosts you have not saved.** Session ▸ *Network scan* takes a CIDR block
+(`192.168.1.0/24`), a range (`192.168.1.10-60`) or one address, and TCP-connects
+one port — 22 by default — across up to 4,096 addresses. Every host that answers
+shows its banner and, for SSH, the host key it offers through `ssh-keyscan`, so
+the fingerprint is there to check before the first connection. Add the ones you
+want as sessions in one click; a host and port already in the list is skipped. It
+is not a port scanner: one port, no ping, no ICMP, and nothing is written until
+you add a host.
+
+**One key for the terminal alone.** `Ctrl+Shift+Z` hides the sidebar, the tool
+panel and the status bar together, and the same chord brings them back exactly as
+they were. It is a view, not a setting: the layout saved at exit is the one you
+chose outside focus mode.
+
 **Small things that matter.** Windows Credential Manager for saved passwords
 via an `SSH_ASKPASS` helper (the secret never sits in a config file), a local
 PowerShell tab for when you just need a shell, quick connect (`user@host:port`),
@@ -181,7 +195,7 @@ the standard Windows jump list of recent hosts, a tray icon, and per-monitor DPI
 
 ## Quick start
 
-1. Install `SSH-it-Setup-1.0.31.exe` (per-user, no admin prompt).
+1. Install `SSH-it-Setup-1.0.32.exe` (per-user, no admin prompt).
 2. `File → Import from OpenSSH config`, or press `Ctrl+K` and type `user@host`.
 3. Double-click a host. That is it.
 
@@ -200,6 +214,7 @@ runtime to install.
 | `Ctrl+Shift+D` / `Ctrl+Shift+E` | Split pane right / down |
 | `Ctrl+Shift+Q` | Close the focused pane |
 | `Ctrl+Shift+B` | Broadcast keystrokes to every pane in the tab |
+| `Ctrl+Shift+Z` | Focus mode: hide the sidebar, tool panel and status bar |
 | `Ctrl+Shift+M` | Move the tab into its own window |
 | `Ctrl+Tab`, `Alt+1…9` | Move between tabs |
 | `Ctrl+Shift+C` / `Ctrl+Shift+V` | Copy / paste |
@@ -226,6 +241,7 @@ ssh-it --sftp-put <session> <local> <remote>
 ssh-it --tunnel-up <session> L:127.0.0.1:8080:localhost:80 --json
 ssh-it --tunnel-list --json
 ssh-it --tunnel-down <id|spec>
+ssh-it --scan 192.168.1.0/24 --json               # TCP connect on one port
 ssh-it --mcp                                      # stdio MCP server
 ```
 
@@ -267,7 +283,7 @@ SSH-it.exe --selftest
 ```
 
 It exits 0 on success and writes `%APPDATA%\SSH-it\logs\selftest.txt`. The suite
-is 500 checks (plus the PowerShell module's 10) and covers cursor addressing,
+is 513 checks (plus the PowerShell module's 10) and covers cursor addressing,
 wrapping, scrollback, alternate screen, SGR colours, wide characters, DEC graphics,
 save/restore, OSC titles, shell-integration marks, the agent surface, leases,
 policy, the ledger, sync, deploy and the bench arithmetic. One check skips under a
@@ -341,6 +357,6 @@ Issues and questions: [github.com/ModdySwag/SSH-it/issues](https://github.com/Mo
 
 ## Licence
 
-MIT.
+MIT. The full grant is in [LICENSE](LICENSE).
 
 Cheers Moddy!

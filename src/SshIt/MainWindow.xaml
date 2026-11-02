@@ -97,6 +97,8 @@
                                   Click="ToggleRightPanel_Click" />
                         <MenuItem x:Name="MenuStatusBar" Header="Status _bar" IsCheckable="True" IsChecked="True"
                                   Click="ToggleStatusBar_Click" />
+                        <MenuItem x:Name="MenuFocus" Header="_Focus mode" InputGestureText="Ctrl+Shift+Z"
+                                  IsCheckable="True" Click="ToggleFocusMode_Click" />
                         <Separator />
                         <MenuItem x:Name="MenuTheme" Header="_Theme" />
                         <MenuItem x:Name="MenuTerminalColours" Header="Terminal _colours" />
@@ -122,6 +124,7 @@
                         <MenuItem Header="_Reconnect" Click="Reconnect_Click" />
                         <MenuItem Header="Diagnose _connection…" InputGestureText="Ctrl+Shift+G" Click="Diagnose_Click" />
                         <MenuItem Header="Fleet _posture…" Click="FleetPosture_Click" />
+                        <MenuItem Header="Network _scan…" Click="NetworkScan_Click" />
                         <MenuItem Header="Watch a _command…" Click="WatchCommand_Click" />
                         <MenuItem Header="Compare command _output…" Click="CompareOutput_Click" />
                         <MenuItem Header="_Blast radius…" Click="BlastRadius_Click" />
