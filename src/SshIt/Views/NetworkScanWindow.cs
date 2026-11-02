@@ -86,13 +86,13 @@ public sealed class NetworkScanWindow : Window
         AutomationProperties.SetAutomationId(_target, "ScanTarget");
         AutomationProperties.SetName(_target, "Addresses");
 
-        _port.Width = 52;
+        _port.Width = 92;
         _port.Text = NetworkScan.DefaultPort.ToString();
         _port.Margin = new Thickness(6, 0, 14, 0);
         _port.VerticalContentAlignment = VerticalAlignment.Center;
         AutomationProperties.SetAutomationId(_port, "ScanPort");
 
-        _timeout.Width = 58;
+        _timeout.Width = 100;
         _timeout.Text = NetworkScan.DefaultTimeoutMs.ToString();
         _timeout.Margin = new Thickness(6, 0, 14, 0);
         _timeout.VerticalContentAlignment = VerticalAlignment.Center;
@@ -166,8 +166,8 @@ public sealed class NetworkScanWindow : Window
         view.Columns.Add(Column("Address", "Address", 150));
         view.Columns.Add(Column("Port", "Port", 55));
         view.Columns.Add(Column("Service", "Service", 70));
-        view.Columns.Add(Column("Banner", "BannerText", 440));
-        view.Columns.Add(Column("Fingerprint", "FingerprintText", 230));
+        view.Columns.Add(TrimmedColumn("Banner", "BannerText", 360));
+        view.Columns.Add(TrimmedColumn("Fingerprint", "FingerprintText", 360));
         view.Columns.Add(Column("ms", "Milliseconds", 55));
         _hits.View = view;
 
@@ -216,6 +216,22 @@ public sealed class NetworkScanWindow : Window
         Width = width,
         DisplayMemberBinding = new System.Windows.Data.Binding(path)
     };
+
+    /// <summary>A cell that shortens with an ellipsis and keeps the full text in its tooltip.</summary>
+    private static GridViewColumn TrimmedColumn(string header, string path, double width)
+    {
+        var factory = new FrameworkElementFactory(typeof(TextBlock));
+        factory.SetValue(TextBlock.TextTrimmingProperty, TextTrimming.CharacterEllipsis);
+        factory.SetValue(TextBlock.VerticalAlignmentProperty, VerticalAlignment.Center);
+        factory.SetBinding(TextBlock.TextProperty, new System.Windows.Data.Binding(path));
+        factory.SetBinding(FrameworkElement.ToolTipProperty, new System.Windows.Data.Binding(path));
+        return new GridViewColumn
+        {
+            Header = header,
+            Width = width,
+            CellTemplate = new DataTemplate { VisualTree = factory }
+        };
+    }
 
     private void Note(string text, bool bad = false)
     {

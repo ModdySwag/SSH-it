@@ -3617,7 +3617,7 @@ public static class SelfTest
             summary.Length + " chars");
 
         Check("help: the changelog names this build and mentions no network",
-            Changelog.Text.Contains("1.0.32", StringComparison.Ordinal)
+            Changelog.Text.Contains("1.0.33", StringComparison.Ordinal)
             && Changelog.Text.Contains("MCP", StringComparison.Ordinal)
             && !Changelog.Text.Contains("http", StringComparison.OrdinalIgnoreCase),
             Changelog.Text.Length + " chars");

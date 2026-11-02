@@ -195,7 +195,7 @@ the standard Windows jump list of recent hosts, a tray icon, and per-monitor DPI
 
 ## Quick start
 
-1. Install `SSH-it-Setup-1.0.32.exe` (per-user, no admin prompt).
+1. Install `SSH-it-Setup-1.0.33.exe` (per-user, no admin prompt).
 2. `File → Import from OpenSSH config`, or press `Ctrl+K` and type `user@host`.
 3. Double-click a host. That is it.
 

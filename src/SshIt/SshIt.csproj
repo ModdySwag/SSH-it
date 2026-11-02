@@ -12,8 +12,8 @@
     <ApplicationIcon>Assets\ssh-it.ico</ApplicationIcon>
     <RootNamespace>SshIt</RootNamespace>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <Version>1.0.32</Version>
-    <FileVersion>1.0.32.0</FileVersion>
+    <Version>1.0.33</Version>
+    <FileVersion>1.0.33.0</FileVersion>
     <Product>SSH-it</Product>
     <Company>SshIt</Company>
     <Description>SSH-it — the SSH workspace for Windows</Description>

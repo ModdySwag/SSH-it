@@ -8,7 +8,9 @@ namespace SshIt.Services;
 public static class Changelog
 {
     public const string Text =
-        "1.0.32 — the current build\n" +
+        "1.0.33 — the current build\n" +
+        "\n" +
+        "  · The port and timeout boxes fit five-digit values instead of clipping them.\n" +
         "\n" +
         "Network discovery\n" +
         "  · Session > Network scan finds SSH hosts on a network you name: a CIDR block, a\n" +
