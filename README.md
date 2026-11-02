@@ -10,6 +10,16 @@ from OpenSSH, no account, no cloud.
 
 ![SSH-it: a live session, a file panel and a session list](docs/screenshots/ssh-it-main.png)
 
+## Screens
+
+| | |
+|---|---|
+| ![Terminal](docs/screenshots/ssh-it-terminal.png) | ![Files](docs/screenshots/ssh-it-files.png) |
+| The terminal: ConPTY host, full VT parser, your prompt. | Files over the same ssh connection: dual panes, mirror, resume. |
+| ![Sessions](docs/screenshots/ssh-it-sessions.png) | ![Window](docs/screenshots/ssh-it-main.png) |
+| Sessions as plain JSON, tags and folders included. | The whole window: session list, terminal and file panel. |
+
+
 ## What it does
 
 **Sessions you own.** Hosts live in plain JSON under `%APPDATA%\SSH-it`, or next
