@@ -1,5 +1,9 @@
 ﻿# SSH-it
 
+[![Licence: MIT](https://img.shields.io/badge/licence-MIT-0E8C7C?style=flat-square)](LICENSE)
+![Platform: Windows](https://img.shields.io/badge/platform-Windows-0A7A6C?style=flat-square)
+[![Latest release](https://img.shields.io/github/v/release/ModdySwag/SSH-it?color=FFB86B&label=release&style=flat-square)](https://github.com/ModdySwag/SSH-it/releases)
+
 **A native SSH workspace for Windows.**
 
 SSH-it is a Windows program for people who live in SSH all day. It drives the
